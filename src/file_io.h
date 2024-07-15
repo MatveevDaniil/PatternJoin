@@ -1,11 +1,11 @@
 #ifndef FILE_IO_H
 #define FILE_IO_H
 
+#include <cmath>
 #include <vector>
 #include <string>
 #include <fstream>
 #include "hash_containers.h"
-#include <absl/container/flat_hash_set.h>
 
 double readFile(
   const std::string& file_name,

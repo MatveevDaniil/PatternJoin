@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <stdexcept>
 
 
 using PatternFuncType = std::vector<std::string>(*)(const std::string&, std::vector<std::string>*);
