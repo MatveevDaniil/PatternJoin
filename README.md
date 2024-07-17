@@ -7,7 +7,7 @@ This project is a tool for words edit similarity joins (a.k.a. all-pairs similar
 _Edit Similarity Join_ is a specific problem when we have a set of words $X=\{w_1, w_2, \ldots, w_n\}$ and we want to find all pairs of 'similar words' $Y_c=\{(w_i, w_j): distance(w_i, w_j) < c\}$, where $c \in \mathbb{N}_0$ is called a _cutoff_ parameter.
 
 ### Paper
-In progress..:mage:
+In progress..🧙
 
 ## Building
 ### Build with CMake
@@ -49,7 +49,7 @@ Space separated pairs of words separated by `\n`: `<word_i> <word_j>\n...`.
 
 
 ## Benchmarks
-In progress..:mage:
+In progress..🧙
 
 ## Third-party software
 Currently, the project is [using](./thirdparty/) third-party software for hashmap, hashsets, and inlined vectors. 
