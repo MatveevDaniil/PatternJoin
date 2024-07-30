@@ -1,5 +1,5 @@
-#ifndef BOUNDED_EDIT_DISTANCE_H
-#define BOUNDED_EDIT_DISTANCE_H
+#ifndef BOUNDED_EDIT_DISTANCE_HPP
+#define BOUNDED_EDIT_DISTANCE_HPP
 
 #include <string>
 #include <algorithm>
@@ -18,4 +18,7 @@ bool hamming_distance_k(
     int k
 );
 
-#endif // BOUNDED_EDIT_DISTANCE_H
+using distance_k_ptr = bool (*)(std::string, std::string, int);
+distance_k_ptr get_distance_k(char metric);
+
+#endif // BOUNDED_EDIT_DISTANCE_HPP

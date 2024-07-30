@@ -1,9 +1,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "sim_search_patterns.h"
-#include "sim_search_semi_patterns.h"
-#include "sim_search_part_patterns.h"
+#include "sim_search_patterns.hpp"
+#include "sim_search_semi_patterns.hpp"
+#include "sim_search_part_patterns.hpp"
 
 
 int main(int argc, char* argv[]) {

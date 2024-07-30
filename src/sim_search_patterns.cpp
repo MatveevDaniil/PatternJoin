@@ -1,4 +1,4 @@
-#include "sim_search_patterns.h"
+#include "sim_search_patterns.hpp"
 
 void sim_search_patterns(
   const std::vector<std::string>& strings,
@@ -10,7 +10,7 @@ void sim_search_patterns(
   bool include_duplicates
 ) {
   str2ints pat2str;
-  map_patterns(strings, cutoff, metric, str2idx, strings_subset, pat2str);
+  map_patterns<TrimDirection::No>(strings, cutoff, metric, str2idx, strings_subset, pat2str);
 
   for (auto entry = pat2str.begin(); entry != pat2str.end(); entry++) {
     if (entry->second.size() > 1) {

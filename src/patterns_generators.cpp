@@ -1,4 +1,4 @@
-#include "patterns_generators.h"
+#include "patterns_generators.hpp"
 
 std::vector<std::string> Hamming1Patterns(
     const std::string& str,

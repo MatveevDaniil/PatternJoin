@@ -1,11 +1,11 @@
-#ifndef FILE_IO_H
-#define FILE_IO_H
+#ifndef FILE_IO_HPP
+#define FILE_IO_HPP
 
 #include <cmath>
 #include <vector>
 #include <string>
 #include <fstream>
-#include "hash_containers.h"
+#include "hash_containers.hpp"
 
 double readFile(
   const std::string& file_name,
@@ -25,4 +25,4 @@ void writeFile(
   const std::vector<std::string>& strings
 );
 
-#endif // FILE_IO_H
+#endif // FILE_IO_HPP

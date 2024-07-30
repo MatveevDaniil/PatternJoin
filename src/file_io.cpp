@@ -1,4 +1,4 @@
-#include "file_io.h"
+#include "file_io.hpp"
 
 double readFile(
   const std::string& file_name,

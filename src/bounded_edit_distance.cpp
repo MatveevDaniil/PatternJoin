@@ -1,4 +1,4 @@
-#include "bounded_edit_distance.h"
+#include "bounded_edit_distance.hpp"
 
 bool edit_distance_k(
     std::string a, 
@@ -115,4 +115,14 @@ bool hamming_distance_k(
     }
 
     return true;
+}
+
+
+distance_k_ptr get_distance_k(char metric) {
+  if (metric == 'L')
+    return edit_distance_k;
+  else if (metric == 'H')
+    return hamming_distance_k;
+  else
+    throw std::invalid_argument("Invalid metric");
 }

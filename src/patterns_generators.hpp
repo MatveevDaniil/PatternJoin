@@ -1,5 +1,5 @@
-#ifndef PATTERNS_GENERATORS_H
-#define PATTERNS_GENERATORS_H
+#ifndef PATTERNS_GENERATORS_HPP
+#define PATTERNS_GENERATORS_HPP
 
 #include <vector>
 #include <string>
@@ -40,4 +40,4 @@ std::vector<std::string> semi2Patterns(
 );
 
 
-#endif // PATTERNS_GENERATORS_H
+#endif // PATTERNS_GENERATORS_HPP
