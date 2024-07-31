@@ -1,14 +1,18 @@
 #include "sim_search_part_patterns.hpp"
+#include <chrono>
+#include <iostream>
 
 void sim_search_2parts(
   std::vector<std::string> &strings,
   char metric,
   str2int& str2idx,
   int_pair_set& out,
-  bool include_duplicates = true,
+  bool include_eye = true,
   int cutoff = 1
 ) {
   str2ints start2idxs, end2idxs;
+  start2idxs.reserve(strings.size());
+  end2idxs.reserve(strings.size());
   if (metric == 'L')
     for (int i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
@@ -41,7 +45,7 @@ void sim_search_2parts(
   else
     check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, end2idxs, out);
   
-  if (include_duplicates)
+  if (include_eye)
     for (int i = 0; i < strings.size(); i++)
       out.insert({i, i});
 }
@@ -51,10 +55,13 @@ void sim_search_3parts(
   char metric,
   str2int& str2idx,
   int_pair_set& out,
-  bool include_duplicates = true,
+  bool include_eye = true,
   int cutoff = 1
 ) {
   str2ints start2idxs, mid2idxs, end2idxs;
+  start2idxs.reserve(strings.size());
+  mid2idxs.reserve(strings.size());
+  end2idxs.reserve(strings.size());
   if (metric == 'L')
     for (int i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
@@ -113,7 +120,7 @@ void sim_search_3parts(
     check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
   else
     check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, end2idxs, out);
-  if (include_duplicates)
+  if (include_eye)
     for (int i = 0; i < strings.size(); i++)
       out.insert({i, i});
 }
@@ -121,23 +128,28 @@ void sim_search_3parts(
 int sim_search_part_patterns(
   std::string file_name,
   int cutoff,
-  char metric
+  char metric,
+  bool include_duplicates
 ) {
   std::vector<std::string> strings;
-  readFile(file_name, strings);
   str2int str2idx;
-  for (int i = 0; i < static_cast<int>(strings.size()); i++)
-    str2idx[strings[i]] = i;
-  int_pair_set out;
+  str2ints str2idxs;
+  readFile(file_name, strings, str2idx, include_duplicates, str2idxs);
 
+  int_pair_set out;
+  auto start = std::chrono::high_resolution_clock::now(); // Start time
   if (cutoff == 1)
     sim_search_2parts(strings, metric, str2idx, out, true, cutoff);
   else if (cutoff == 2)
     sim_search_3parts(strings, metric, str2idx, out, true, cutoff);
   else
     throw std::invalid_argument("Cutoff=" + std::to_string(cutoff)  + " not implemented for this method.");
+  auto end = std::chrono::high_resolution_clock::now(); // End time
+  std::chrono::duration<double> duration = end - start; // Calculate duration
+  std::cout << "Execution time: " << duration.count() << " seconds" << std::endl;
+
 
   std::string out_file_name = file_name + "_pp_" + std::to_string(cutoff) + "_" + metric;
-  writeFile(out_file_name, out, strings);
+  writeFile(out_file_name, out, strings, str2idxs, include_duplicates);
   return 0;
 }

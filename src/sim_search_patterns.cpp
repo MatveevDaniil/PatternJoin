@@ -7,7 +7,7 @@ void sim_search_patterns(
   str2int& str2idx,
   int_pair_set& out,
   ints* strings_subset,
-  bool include_duplicates
+  bool include_eye
 ) {
   str2ints pat2str;
   map_patterns<TrimDirection::No>(strings, cutoff, metric, str2idx, strings_subset, pat2str);
@@ -26,7 +26,7 @@ void sim_search_patterns(
     }
   }
 
-  if (include_duplicates)
+  if (include_eye)
     for (int i = 0; i < strings.size(); i++)
       out.insert({i, i});
 }
@@ -35,18 +35,18 @@ void sim_search_patterns(
 int sim_search_patterns(
   std::string file_name,
   int cutoff,
-  char metric
+  char metric,
+  bool include_duplicates
 ) {
   std::vector<std::string> strings;
-  double avg_str_len = readFile(file_name, strings);
   str2int str2idx;
-  str2idx.reserve(strings.size());
-  for (int i = 0; i < strings.size(); i++)
-    str2idx[strings[i]] = i;
+  str2ints str2idxs;
+  readFile(file_name, strings, str2idx, include_duplicates, str2idxs);
+
   int_pair_set out;
 
   sim_search_patterns(strings, cutoff, metric, str2idx, out, nullptr, true);
   std::string out_file_name = file_name + "_p_" + std::to_string(cutoff) + "_" + metric;
-  writeFile(out_file_name, out, strings);
+  writeFile(out_file_name, out, strings, str2idxs, include_duplicates);
   return 0;
 }

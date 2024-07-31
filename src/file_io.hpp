@@ -7,22 +7,20 @@
 #include <fstream>
 #include "hash_containers.hpp"
 
-double readFile(
+void readFile(
   const std::string& file_name,
-  std::vector<std::string>& strings
-);
-
-int estimatePatToStrSpace(
-  double avg_str_len,
-  int strings_size,
-  char metric,
-  int cutoff
+  std::vector<std::string>& strings,
+  str2int& str2idx,
+  bool include_duplicates,
+  str2ints& str2idxs
 );
 
 void writeFile(
   const std::string& file_name,
   const int_pair_set& out,
-  const std::vector<std::string>& strings
+  const std::vector<std::string>& strings,
+  str2ints& str2idxs, 
+  bool include_duplicates
 );
 
 #endif // FILE_IO_HPP

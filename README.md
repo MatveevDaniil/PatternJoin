@@ -27,25 +27,27 @@ Assuming you are in the build directory
 
 ### macOS/Linux
 ```shell
-> pattern_join <file_path> <cutoff> <metric> <method>
+> pattern_join --file_name <..> --cutoff <..> --metric_type <..> --method <..> --include_duplicates <..>
 ```
 
 ### Windows
 ```shell
-> pattern_join.exe <file_path> <cutoff> <metric> <method>
+> pattern_join.exe --file_name <..> --cutoff <..> --metric_type <..> --method <..> --include_duplicates <..>
 ```
 
 ### Arguments
-- `<file_path>`: The path to the input file.
-- `<cutoff>`: The edit distance cutoff (`1` or `2`).
-- `<metric>`: The edit distance metric (`L` for Levenshtein, `H` for Hamming).
+- `<file_name>`: The path to the input file.
+- `<cutoff>`: The edit distance cutoff (`0`, `1` or `2`). If `cutoff` = 0, then the value of `metric_type`, `method` and `include_duplicates` does not matter.
+- `<metric_type>`: The edit distance metric (`L` for Levenshtein, `H` for Hamming).
 - `<method>`: The core method of edit similarity join (`pattern`, `semi_pattern`, or `partition_pattern`). As default, we recommend using `partition_pattern` as the most memory-efficient while still fast method. For more details take a look to [the benchmark](#benchmarks) and [the paper](#paper).
+- `<include_duplicates>`: Consider duplicates in input (`true` or `false`). If `false` the program will ignore duplicate strings in the input and output unique pairs of strings. If `true` program will treat duplicate strings in the input as a pair (index, string) and output pairs of indeces. 
 
 ### Input file format
 List of words separated by `\n`: `<word_1>\n<word_2>\n...`.
 
 ### Output file format
-Space separated pairs of words separated by `\n`: `<word_i> <word_j>\n...`.
+If `include_duplicates = true`: Space separated pairs of words separated by `\n`: `<word_i> <word_j>\n...`.
+If `include_duplicates = false`: Space separated pairs of indeces separated by `\n`: `<idx_i> <idx_j>\n...`.
 
 
 ## Benchmarks
@@ -54,19 +56,19 @@ In progress..🧙
 ## Third-party software
 Currently, the project is [using](./thirdparty/) third-party software for hashmap, hashsets, and inlined vectors. 
 Hashmaps and hashset are taken from the [ankerl](https://github.com/martinus/unordered_dense) project and inlined vector from [gch](https://github.com/gharveymn/small_vector) project.
-You can easily replace any of these containers with any other implementations of hashmap/hashset/vector by changing the corresponding line in [src/hash_containers.h](./src/hash_containers.h#L7-L10):
+You can easily replace any of these containers with any other implementations of hashmap/hashset/vector by changing the corresponding line in [src/hash_containers.h](./src/hash_containers.hpp#L7-L11):
 ```c++
 // src/hash_containers.h
 using str2int = your_map<std::string, int>;
 using ints = your_vector<int>;
 using str2ints = your_map<std::string, ints>;
 using int_pair_set = your_set<std::pair<int, int>>;
+using str_pair_set = your_set<std::pair<std::string, std::string>>
 ```
 
 ## Roadmap
-1. Implement duplicates in the input and edit distance zero.
-2. Do benchmarks.
-3. Finish documentation.
-4. Create R/Python packages.
-5. PAPER
-6. Cover edit distances $\geq 3$.
+1. Benchmarks.
+2. Finish documentation.
+3. Create R/Python packages.
+4. PAPER
+5. Cover edit distances $\geq 3$.

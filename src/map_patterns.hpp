@@ -24,10 +24,16 @@ void map_patterns(
     for (std::string str: strings)
       for (const auto& pattern: PatternFunc(str, nullptr)) 
         pat2str[pattern].push_back(str2idx[str]);
-  else
-    for (int str_idx: *strings_subset)
-      for (const auto& pattern: PatternFunc(trimString<trim_direction>(strings[str_idx], trim_size), nullptr)) 
-        pat2str[pattern].push_back(str_idx);
+  else {
+    if (trim_direction == TrimDirection::No)
+      for (int str_idx: *strings_subset)
+        for (const auto& pattern: PatternFunc(strings[str_idx], nullptr)) 
+          pat2str[pattern].push_back(str_idx);
+    else
+      for (int str_idx: *strings_subset)
+        for (const auto& pattern: PatternFunc(trimString<trim_direction>(strings[str_idx], trim_size), nullptr)) 
+          pat2str[pattern].push_back(str_idx);
+  }
 }
 
 #endif // MAP_PATTERNS_HPP

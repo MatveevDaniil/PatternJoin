@@ -1,58 +1,66 @@
 #include "file_io.hpp"
 
-double readFile(
+void readFile(
   const std::string& file_name,
-  std::vector<std::string>& strings
+  std::vector<std::string>& strings,
+  str2int& str2idx,
+  bool include_duplicates,
+  str2ints& str2idxs
 ) {
-  double avg_str_len = 0;
-
   std::ifstream file(file_name);
   if (!file) {
     throw std::runtime_error("File does not exist");
   }
   std::string line;
   while (std::getline(file, line)) {
-    if (!line.empty() && line.back() == '\n') {
+    if (!line.empty() && line.back() == '\n')
         line.pop_back();
-    }
     if (line == "")
       throw std::runtime_error("Empty line spotted in the input file\n");
     strings.push_back(line);
-    avg_str_len += line.size();
+  }
+
+  str2idx.reserve(strings.size());
+  for (int i = 0; i < strings.size(); i++)
+    str2idx[strings[i]] = i;
+  if (include_duplicates) {
+    str2idxs.reserve(strings.size());
+    for (int i = 0; i < strings.size(); i++)
+      str2idxs[strings[i]].push_back(i);
+
   }
   file.close();
-
-  avg_str_len /=strings.size();    
-  return avg_str_len;
 }
 
 void writeFile(
   const std::string& file_name,
   const int_pair_set& out,
-  const std::vector<std::string>& strings
+  const std::vector<std::string>& strings,
+  str2ints& str2idxs, 
+  bool include_duplicates
 ) {
   std::ofstream out_file;
   out_file.open(file_name);
-  for (const auto& pair : out)
-    out_file << strings[pair.first] << " " << strings[pair.second] << "\n";
-  out_file.close();
-}
-
-int estimatePatToStrSpace(
-  double avg_str_len,
-  int strings_count,
-  char metric,
-  int cutoff
-) {
-  if (cutoff == 1 && metric == 'H') {
-    return std::round(strings_count * (avg_str_len + 1));
-  } else if (cutoff == 2 && metric == 'H') {
-    return std::round(strings_count * (avg_str_len * (avg_str_len + 1) / 2 + 2));
-  } else if (cutoff == 1 && metric == 'L') {
-    return std::round(strings_count * (avg_str_len * 2 + 1));
-  } else if (cutoff == 2 && metric == 'L') {
-    return std::round(strings_count * (2 * avg_str_len * avg_str_len + avg_str_len + 1));
-  } else {
-    throw std::invalid_argument("Choose metric param from {L, H} and cutoff from {0, 1, 2}");
+  if (!include_duplicates)
+    for (const auto& pair : out)
+      out_file << strings[pair.first] << " " << strings[pair.second] << "\n";
+  else {
+    str_pair_set unique_out;
+    for (const auto& pair : out) {
+      std::string str1 = strings[pair.first], str2 = strings[pair.second];
+      if (str1 < str2)
+        unique_out.insert({str1, str2});
+      else
+        unique_out.insert({str2, str1});
+    }
+    for (auto pair : unique_out) {
+      std::string str1 = pair.first, str2 = pair.second;
+      for (auto str_idx1 : str2idxs[str1])
+        for (auto str_idx2 : str2idxs[str2]) {
+          out_file << str_idx1 << " " << str_idx2 << "\n";
+          out_file << str_idx2 << " " << str_idx1 << "\n";
+        }
+      }
   }
+  out_file.close();
 }
