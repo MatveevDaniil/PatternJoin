@@ -73,18 +73,22 @@ The performance of PatternJoin project is compared to several state-of-the-art p
 ### TCR Profile
 We obtained [dataset](https://clients.adaptivebiotech.com/pub/Emerson-2017-NatGen) from Cytomegalovirus [research](https://www.nature.com/articles/ng.3822) and took the largest TCR CDR3 Amino Acid profile (TODO: submit data) from it. There are $425080$ sequences in the profile with the average sequence length is $14.6$. Below are speed comparisons for edit distance threshold 1 and 2.
 
-<div style="display: flex; justify-content: space-between;">
+<!-- <div style="display: flex; justify-content: space-between;">
     <img src="benchmarks/chart_TCR_1.png" alt="Edit distance 1" style="width: 45%;">
     <img src="benchmarks/chart_TCR_2.png" alt="Edit distance 2" style="width: 45%;">
-</div>
+</div> -->
+![TCR1](benchmarks/chart_TCR_1.png)
+![TCR2](benchmarks/chart_TCR_2.png)
 
 ### BCR Profile
 (TODO: introduce data). The number of sequences is $464104$ with the average sequence length $18.7$. Below are speed comparisons for edit distance threshold 1 and 2. 
 
-<div style="display: flex; justify-content: space-between;">
+<!-- <div style="display: flex; justify-content: space-between;">
     <img src="benchmarks/chart_BCR_1.png" alt="Edit distance 1" style="width: 45%;">
     <img src="benchmarks/chart_BCR_2.png" alt="Edit distance 2" style="width: 45%;">
-</div>
+</div> -->
+![BCR1](benchmarks/chart_BCR_1.png)
+![BCR2](benchmarks/chart_BCR_2.png)
 
 
 ## Third-party software
