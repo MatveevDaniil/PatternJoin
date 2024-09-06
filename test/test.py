@@ -124,7 +124,7 @@ def check_project(
   for method in methods:
     print(f'\tChecking method: {method}')
     method_shortcut = get_method_shortcut(method)
-    pattern_run_command = '../build/pattern_join_50 --file_name {} --cutoff {} --metric_type {} --method {} --include_duplicates false'
+    pattern_run_command = '../build/pattern_join --file_name {} --cutoff {} --metric_type {} --method {} --include_duplicates false'
     dist_param = get_distance_param(distance)
     run_command = pattern_run_command.format(input_fname, cutoff, dist_param, method)
     stderr = subprocess.run(run_command, shell=True, text=True, capture_output=True).stderr
