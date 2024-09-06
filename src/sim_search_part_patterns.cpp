@@ -40,10 +40,7 @@ void sim_search_2parts(
     }
   
   check_part<TrimDirection::Start>(strings, cutoff, metric, str2idx, start2idxs, out);
-  if (metric == 'L')
-    check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
-  else
-    check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, end2idxs, out);
+  check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
   
   if (include_eye)
     for (int i = 0; i < strings.size(); i++)
@@ -115,11 +112,10 @@ void sim_search_3parts(
     }
 
   check_part<TrimDirection::Start>(strings, cutoff, metric, str2idx, start2idxs, out);
-  check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, mid2idxs, out);
-  if (metric == 'L')
-    check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
-  else
-    check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, end2idxs, out);
+  start2idxs.clear();
+  check_part<TrimDirection::Mid>(strings, cutoff, metric, str2idx, mid2idxs, out);
+  mid2idxs.clear();
+  check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
   if (include_eye)
     for (int i = 0; i < strings.size(); i++)
       out.insert({i, i});
@@ -137,17 +133,12 @@ int sim_search_part_patterns(
   readFile(file_name, strings, str2idx, include_duplicates, str2idxs);
 
   int_pair_set out;
-  auto start = std::chrono::high_resolution_clock::now(); // Start time
   if (cutoff == 1)
     sim_search_2parts(strings, metric, str2idx, out, true, cutoff);
   else if (cutoff == 2)
     sim_search_3parts(strings, metric, str2idx, out, true, cutoff);
   else
     throw std::invalid_argument("Cutoff=" + std::to_string(cutoff)  + " not implemented for this method.");
-  auto end = std::chrono::high_resolution_clock::now(); // End time
-  std::chrono::duration<double> duration = end - start; // Calculate duration
-  std::cout << "Execution time: " << duration.count() << " seconds" << std::endl;
-
 
   std::string out_file_name = file_name + "_pp_" + std::to_string(cutoff) + "_" + metric;
   writeFile(out_file_name, out, strings, str2idxs, include_duplicates);

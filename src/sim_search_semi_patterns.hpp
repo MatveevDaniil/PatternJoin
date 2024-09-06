@@ -18,18 +18,20 @@ void sim_search_semi_patterns_impl(
   int_pair_set& out,
   ints* strings_subset = nullptr,
   bool include_eye = true,
-  int trim_size = 0
+  const std::string &trim_part = ""
 ) {
   str2ints pat2str;
-  map_patterns<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat2str, trim_size);
+  int trim_size = trim_part.size();
+  map_patterns<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat2str, trim_part, metric);
   distance_k_ptr distance_k = get_distance_k(metric);
 
-  if (trim_direction == TrimDirection::No) {
+  if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
     for (auto entry = pat2str.begin(); entry != pat2str.end(); entry++)
       if (entry->second.size() > 1)
         for (auto str_idx1 = entry->second.begin(); str_idx1 != entry->second.end(); ++str_idx1) {
+          std::string str1 = strings[*str_idx1];
           for (auto str_idx2 = str_idx1 + 1; str_idx2 != entry->second.end(); ++str_idx2)
-            if (distance_k(strings[*str_idx1], strings[*str_idx2], cutoff)) {
+            if (distance_k(str1, strings[*str_idx2], cutoff)) {
               if (*str_idx1 > *str_idx2)
                 out.insert({*str_idx2, *str_idx1});
               else

@@ -120,20 +120,22 @@ def check_project(
     distance: str,
     cutoff: int
 ):
-  if (distance == 'hamming'):
-    methods = ['pattern', 'semi_pattern', 'partition_pattern']
-  else:
-    methods = ['pattern', 'semi_pattern', 'partition_pattern']
+  methods = ['pattern', 'semi_pattern', 'partition_pattern']
   for method in methods:
     print(f'\tChecking method: {method}')
     method_shortcut = get_method_shortcut(method)
-    pattern_run_command = '../build/pattern_join --file_name {} --cutoff {} --metric_type {} --method {} --include_duplicates false'
+    pattern_run_command = '../build/pattern_join_50 --file_name {} --cutoff {} --metric_type {} --method {} --include_duplicates false'
     dist_param = get_distance_param(distance)
     run_command = pattern_run_command.format(input_fname, cutoff, dist_param, method)
     stderr = subprocess.run(run_command, shell=True, text=True, capture_output=True).stderr
     out_ext = f'{method_shortcut}_{cutoff}_{dist_param}'
     pattern_out_fname = f'{input_fname}_{out_ext}'
-    if not compare_outputs(pattern_out_fname, output_fname):
+    try:
+      compare_result = compare_outputs(pattern_out_fname, output_fname)
+    except:
+      print(f'not found the output file: {pattern_out_fname}')
+      compare_result = False
+    if compare_result == False:
       print(f'Error!!!!!!!\n\
             input_fname={input_fname}\n\
             output_fname={output_fname}\n\
