@@ -55,7 +55,11 @@ Options parse_arguments(int argc, char* argv[]) {
 
         const bool has_second_file = optind < argc &&
           argv[optind][0] != '\0' && argv[optind][0] != '-';
-        if (!has_second_file)
+        const bool has_third_file =
+          optind + 1 < argc && argv[optind + 1][0] != '-';
+        const bool has_exactly_two_files =
+          has_second_file && !has_third_file;
+        if (!has_exactly_two_files)
           throw std::runtime_error(
             "--file_names requires exactly two paths");
 
