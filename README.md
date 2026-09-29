@@ -43,7 +43,8 @@ Assuming you are in the build directory
 
 ### Arguments
 - `<file_name>`: The path to the input file.
-- `<cutoff>`: The edit distance cutoff (`0`, `1` or `2`). If `cutoff` = 0, then the value of `metric_type`, `method` and `include_duplicates` does not matter.
+- `--file_b` (`-b`): Optional second input file; joins the first file against this one using `semi_pattern`. Output: `<file_name>_cross_sp_<cutoff>_<metric>`, with ordered first/second-file pairs (zero-based indices if `include_duplicates=true`, unique strings otherwise).
+- `<cutoff>`: The edit distance cutoff (`0`, `1` or `2`). For single-file joins with `cutoff` = 0, the value of `metric_type`, `method` and `include_duplicates` does not matter.
 - `<metric_type>`: The edit distance metric (`L` for Levenshtein, `H` for Hamming).
 - `<method>`: The core method of edit similarity join (`pattern`, `semi_pattern`, or `partition_pattern`). As default, we recommend using `partition_pattern` as the most memory-efficient while still fast method. For more details take a look to [the paper](#paper).
 - `<include_duplicates>`: Consider duplicates in input (`true` or `false`). If `false` the program will ignore duplicate strings in the input and output unique pairs of strings. If `true` program will treat duplicate strings in the input as a pair (index, string) and output pairs of indeces. 
@@ -109,21 +110,3 @@ using str_pair_set = your_set<std::pair<std::string, std::string>>
 2. Create R/Python packages.
 3. PAPER
 4. Cover edit distances $\geq 3$.
-## Joining two datasets
-
-Use `semi_pattern` with an optional second input file:
-
-```sh
-pattern_join --file_name a.txt --file_name_b b.txt --cutoff 1 --metric_type L --method semi_pattern --include_duplicates true
-```
-
-Results are written to `a.txt_cross_sp_1_L`. With `include_duplicates=true`,
-each pair contains a zero-based index in A followed by an index in B, preserving
-all duplicate occurrences. With `false`, results are unique ordered string pairs.
-Cutoffs 0, 1 and 2 are inclusive. The existing input-file format is unchanged.
-Without `--file_name_b`, the existing self-join behavior is unchanged.
-
-The in-memory overload is
-`sim_search_semi_patterns(strings_a, strings_b, cutoff, metric, out)`.
-It adds A/B index pairs to `out`, using the existing semi-pattern generators
-and distance checks. It does not add self-join diagonal pairs or reorder indices.

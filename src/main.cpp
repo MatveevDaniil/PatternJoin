@@ -10,7 +10,7 @@
 
 struct Options {
   std::string file_name;
-  std::string file_name_b;
+  std::string file_b;
   int cutoff;
   char metric;
   std::string method;
@@ -23,7 +23,7 @@ Options parse_arguments(int argc, char* argv[]) {
   int option_index = 0;
 
   struct option long_options[] = {
-    {"file_name_b", 1, 0, 'b'},
+    {"file_b", 1, 0, 'b'},
     {"file_name", 1, 0, 'f'},
     {"cutoff", 1, 0, 'c'},
     {"metric_type", 1, 0, 't'},
@@ -35,7 +35,7 @@ Options parse_arguments(int argc, char* argv[]) {
   while ((opt = getopt_long(argc, argv, "f:b:c:t:m:d:", long_options, &option_index)) != -1) {
     switch (opt) {
       case 'b':
-        options.file_name_b = optarg;
+        options.file_b = optarg;
         break;
       case 'f':
         options.file_name = optarg;
@@ -73,13 +73,13 @@ Options parse_arguments(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
   if (argc < 11)
     throw std::runtime_error(
-      "arguments: --file_name <file_name> --cutoff <cutoff> --metric_type <metric> --method <method> --include_duplicates <true/false>");
+      "arguments: --file_name <file_name> [--file_b <file_name>] --cutoff <cutoff> --metric_type <metric> --method <method> --include_duplicates <true/false>");
 
   Options opt = parse_arguments(argc, argv);
-  if (!opt.file_name_b.empty()) {
+  if (!opt.file_b.empty()) {
     if (opt.method != "semi_pattern")
       throw std::runtime_error("Two-file joins use method semi_pattern");
-    return sim_search_semi_patterns(opt.file_name, opt.file_name_b, opt.cutoff, opt.metric, opt.include_duplicates);
+    return sim_search_semi_patterns(opt.file_name, opt.file_b, opt.cutoff, opt.metric, opt.include_duplicates);
   }
   if (opt.cutoff == 0) {
     duplicates_search(opt.file_name);
