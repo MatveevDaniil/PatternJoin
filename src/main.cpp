@@ -32,22 +32,27 @@ Options parse_arguments(int argc, char* argv[]) {
     {0, 0, 0, 0}
   };
 
-  while ((opt = getopt_long(argc, argv, "f:c:t:m:d:", long_options, &option_index)) != -1) {
+  while ((opt = getopt_long(
+    argc, argv, "f:c:t:m:d:", long_options, &option_index
+  )) != -1) {
     switch (opt) {
+      case 'f':
       case 'F':
         if (!options.file_name.empty() || !options.file_names.empty())
-          throw std::runtime_error("Use either --file_name or --file_names, once");
-        if (std::string(optarg).empty() || optarg[0] == '-' || optind >= argc ||
-            std::string(argv[optind]).empty() || argv[optind][0] == '-')
-          throw std::runtime_error("--file_names requires exactly two paths");
-        options.file_names = {optarg, argv[optind++]};
-        break;
-      case 'f':
-        if (!options.file_name.empty() || !options.file_names.empty())
-          throw std::runtime_error("Use either --file_name or --file_names, once");
-        if (std::string(optarg).empty() || optarg[0] == '-')
-          throw std::runtime_error("--file_name requires exactly one path");
-        options.file_name = optarg;
+          throw std::runtime_error(
+            "Use either --file_name or --file_names, once");
+        if (optarg[0] == '\0' || optarg[0] == '-')
+          throw std::runtime_error("Expected an input file path");
+
+        if (opt == 'f') {
+          options.file_name = optarg;
+        } else {
+          if (optind >= argc || argv[optind][0] == '\0' ||
+              argv[optind][0] == '-')
+            throw std::runtime_error(
+              "--file_names requires exactly two paths");
+          options.file_names = {optarg, argv[optind++]};
+        }
         break;
       case 'c':
         options.cutoff = std::stoi(optarg);
@@ -58,7 +63,9 @@ Options parse_arguments(int argc, char* argv[]) {
         else if (std::string(optarg) == "L")
           options.metric = 'L';
         else
-          throw std::runtime_error("Invalid metric type, use `H` for hamming or `L` for levenshtein distance");
+          throw std::runtime_error(
+            "Invalid metric type, use `H` for hamming "
+            "or `L` for levenshtein distance");
         break;
       case 'm':
         options.method = optarg;
@@ -69,7 +76,9 @@ Options parse_arguments(int argc, char* argv[]) {
         else if (std::string(optarg) == "false")
           options.include_duplicates = false;
         else
-          throw std::runtime_error("Invalid value for include_duplicates, use `true` or `false`");
+          throw std::runtime_error(
+            "Invalid value for include_duplicates, "
+            "use `true` or `false`");
         break;
       default:
         throw std::runtime_error("Unknown option");
@@ -79,33 +88,48 @@ Options parse_arguments(int argc, char* argv[]) {
   if (options.file_name.empty() && options.file_names.empty())
     throw std::runtime_error("Specify --file_name or --file_names");
   if (optind != argc)
-    throw std::runtime_error("--file_name takes one path; --file_names takes two");
+    throw std::runtime_error(
+      "--file_name takes one path; --file_names takes two");
   return options;
 }
 
 int main(int argc, char* argv[]) {
   if (argc < 11)
     throw std::runtime_error(
-      "arguments: (--file_name <file> | --file_names <file_a> <file_b>) --cutoff <cutoff> --metric_type <metric> --method <method> --include_duplicates <true/false>");
+      "arguments: (--file_name <file> | "
+      "--file_names <file_a> <file_b>) "
+      "--cutoff <cutoff> --metric_type <metric> "
+      "--method <method> --include_duplicates <true/false>");
 
   Options opt = parse_arguments(argc, argv);
   if (!opt.file_names.empty()) {
     if (opt.method != "semi_pattern")
-      throw std::runtime_error("Two-dataset joins are currently implemented only for semi_pattern");
-    return sim_search_semi_patterns(opt.file_names[0], opt.file_names[1], opt.cutoff, opt.metric, opt.include_duplicates);
+      throw std::runtime_error(
+        "Two-dataset joins are currently implemented "
+        "only for semi_pattern");
+    return sim_search_semi_patterns(
+      opt.file_names[0], opt.file_names[1], opt.cutoff,
+      opt.metric, opt.include_duplicates);
   }
   if (opt.cutoff == 0) {
     duplicates_search(opt.file_name);
   } else {
     if (opt.method == "pattern")
-      return sim_search_patterns(opt.file_name, opt.cutoff, opt.metric, opt.include_duplicates);
+      return sim_search_patterns(
+        opt.file_name, opt.cutoff, opt.metric,
+        opt.include_duplicates);
     else if (opt.method == "semi_pattern")
-      return sim_search_semi_patterns(opt.file_name, opt.cutoff, opt.metric, opt.include_duplicates);
+      return sim_search_semi_patterns(
+        opt.file_name, opt.cutoff, opt.metric,
+        opt.include_duplicates);
     else if (opt.method == "partition_pattern")
-      return sim_search_part_patterns(opt.file_name, opt.cutoff, opt.metric, opt.include_duplicates);
+      return sim_search_part_patterns(
+        opt.file_name, opt.cutoff, opt.metric,
+        opt.include_duplicates);
     else
       throw std::runtime_error(
-        "Invalid similarity join method use `pattern`, `semi_pattern` or `partition_pattern`");
+        "Invalid similarity join method use `pattern`, "
+        "`semi_pattern` or `partition_pattern`");
   }
   
 }
