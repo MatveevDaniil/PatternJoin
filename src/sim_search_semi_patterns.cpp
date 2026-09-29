@@ -25,8 +25,6 @@ void sim_search_semi_patterns(
   char metric,
   int_pair_set& out
 ) {
-  if (cutoff < 0 || cutoff > 2)
-    throw std::invalid_argument("Cutoff must be 0, 1 or 2");
   distance_k_ptr distance_k = get_distance_k(metric);
   PatternFuncType PatternFunc = cutoff == 0 ? nullptr : getPatternFunc(cutoff, 'S');
   str2ints pat2str;
