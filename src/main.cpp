@@ -21,6 +21,7 @@ Options parse_arguments(int argc, char* argv[]) {
   Options options;
   int opt;
   int option_index = 0;
+  bool input_selected = false;
 
   struct option long_options[] = {
     {"file_names", 1, 0, 'F'},
@@ -32,28 +33,37 @@ Options parse_arguments(int argc, char* argv[]) {
     {0, 0, 0, 0}
   };
 
-  while ((opt = getopt_long(
-    argc, argv, "f:c:t:m:d:", long_options, &option_index
-  )) != -1) {
+  while ((opt = getopt_long(argc, argv, "f:c:t:m:d:", long_options,
+            &option_index)) != -1) {
     switch (opt) {
       case 'f':
-      case 'F':
-        if (!options.file_name.empty() || !options.file_names.empty())
+      case 'F': {
+        if (input_selected)
           throw std::runtime_error(
             "Use either --file_name or --file_names, once");
-        if (optarg[0] == '\0' || optarg[0] == '-')
+
+        const bool invalid_path =
+          optarg[0] == '\0' || optarg[0] == '-';
+        if (invalid_path)
           throw std::runtime_error("Expected an input file path");
 
         if (opt == 'f') {
           options.file_name = optarg;
-        } else {
-          if (optind >= argc || argv[optind][0] == '\0' ||
-              argv[optind][0] == '-')
-            throw std::runtime_error(
-              "--file_names requires exactly two paths");
-          options.file_names = {optarg, argv[optind++]};
+          input_selected = true;
+          break;
         }
+
+        const bool has_second_file = optind < argc &&
+          argv[optind][0] != '\0' && argv[optind][0] != '-';
+        if (!has_second_file)
+          throw std::runtime_error(
+            "--file_names requires exactly two paths");
+
+        options.file_names = {optarg, argv[optind]};
+        optind++;
+        input_selected = true;
         break;
+      }
       case 'c':
         options.cutoff = std::stoi(optarg);
         break;
@@ -85,7 +95,7 @@ Options parse_arguments(int argc, char* argv[]) {
     }
   }
 
-  if (options.file_name.empty() && options.file_names.empty())
+  if (!input_selected)
     throw std::runtime_error("Specify --file_name or --file_names");
   if (optind != argc)
     throw std::runtime_error(
