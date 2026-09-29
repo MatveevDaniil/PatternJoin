@@ -109,3 +109,21 @@ using str_pair_set = your_set<std::pair<std::string, std::string>>
 2. Create R/Python packages.
 3. PAPER
 4. Cover edit distances $\geq 3$.
+## Joining two datasets
+
+Use `semi_pattern` with an optional second input file:
+
+```sh
+pattern_join --file_name a.txt --file_name_b b.txt --cutoff 1 --metric_type L --method semi_pattern --include_duplicates true
+```
+
+Results are written to `a.txt_cross_sp_1_L`. With `include_duplicates=true`,
+each pair contains a zero-based index in A followed by an index in B, preserving
+all duplicate occurrences. With `false`, results are unique ordered string pairs.
+Cutoffs 0, 1 and 2 are inclusive. The existing input-file format is unchanged.
+Without `--file_name_b`, the existing self-join behavior is unchanged.
+
+The in-memory overload is
+`sim_search_semi_patterns(strings_a, strings_b, cutoff, metric, out)`.
+It adds A/B index pairs to `out`, using the existing semi-pattern generators
+and distance checks. It does not add self-join diagonal pairs or reorder indices.

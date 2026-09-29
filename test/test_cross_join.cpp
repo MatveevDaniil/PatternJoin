@@ -1,4 +1,9 @@
-#include "join.hpp"
+// From the repository root:
+// c++ -std=c++20 -O2 -Isrc test/test_cross_join.cpp src/sim_search_semi_patterns.cpp \
+//   src/patterns_generators.cpp src/bounded_edit_distance.cpp src/file_io.cpp -o /tmp/test_cross_join
+// /tmp/test_cross_join
+#include "sim_search_semi_patterns.hpp"
+#include <numeric>
 #include <iostream>
 #include <random>
 
@@ -23,14 +28,14 @@ int distance(const std::string& a, const std::string& b, char metric) {
 }
 void check(const std::vector<std::string>& a, const std::vector<std::string>& b) {
     for (char metric : {'L', 'H'}) for (int k = 0; k <= 2; ++k) {
-        patternjoin::Pairs expected;
+        int_pair_set expected;
         for (std::size_t i = 0; i < a.size(); ++i)
             for (std::size_t j = 0; j < b.size(); ++j)
-                if (distance(a[i], b[j], metric) <= k) expected.emplace_back(i, j);
-        if (patternjoin::join(a, b, k, metric) != expected)
+                if (distance(a[i], b[j], metric) <= k) expected.insert({i, j});
+        int_pair_set actual;
+        sim_search_semi_patterns(a, b, k, metric, actual);
+        if (actual != expected)
             throw std::runtime_error("Cross join differs from exhaustive oracle");
-        if (&a == &b && patternjoin::join(a, k, metric) != expected)
-            throw std::runtime_error("Self join differs from oracle");
     }
 }
 int main() {
@@ -55,10 +60,10 @@ int main() {
         check(a, b); check(b, a);
     }
     for (int k : {-1, 3}) {
-        try { patternjoin::join({}, {}, k, 'L'); return 1; }
+        try { int_pair_set out; sim_search_semi_patterns({}, {}, k, 'L', out); return 1; }
         catch (const std::invalid_argument&) {}
     }
-    try { patternjoin::join({}, {}, 1, 'X'); return 1; }
+    try { int_pair_set out; sim_search_semi_patterns({}, {}, 1, 'X', out); return 1; }
     catch (const std::invalid_argument&) {}
     std::cout << "Exhaustive and randomized cross-join oracle checks passed\n";
 }

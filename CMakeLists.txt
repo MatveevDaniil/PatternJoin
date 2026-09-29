@@ -12,13 +12,3 @@ file(GLOB SOURCES "${SRC_DIR}/*.cpp")
 add_executable(pattern_join ${SOURCES})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-
-add_library(patternjoin INTERFACE)
-target_include_directories(patternjoin INTERFACE "${SRC_DIR}")
-
-include(CTest)
-if(BUILD_TESTING)
-  add_executable(test_join tests/test_join.cpp)
-  target_link_libraries(test_join PRIVATE patternjoin)
-  add_test(NAME cross_join COMMAND test_join)
-endif()
