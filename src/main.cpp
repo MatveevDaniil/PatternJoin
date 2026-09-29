@@ -125,40 +125,46 @@ int main(int argc, char* argv[]) {
       "--method <method> --include_duplicates <true/false>");
 
   Options opt = parse_arguments(argc, argv);
-  const bool cross_join = !opt.file_names.empty();
-  if (!cross_join && opt.cutoff == 0) {
-    duplicates_search(opt.file_name);
-    return 0;
-  }
-
-  switch (opt.method) {
-    case Method::Pattern:
-      if (cross_join)
-        break;
-      return sim_search_patterns(
-        opt.file_name, opt.cutoff, opt.metric,
-        opt.include_duplicates);
-    case Method::SemiPattern:
-      if (cross_join)
+  const bool cross_join = opt.file_names.size() == 2;
+  if (cross_join) {
+    switch (opt.method) {
+      case Method::SemiPattern:
         return sim_search_semi_patterns(
           opt.file_names[0], opt.file_names[1], opt.cutoff,
           opt.metric, opt.include_duplicates);
-      return sim_search_semi_patterns(
-        opt.file_name, opt.cutoff, opt.metric,
-        opt.include_duplicates);
-    case Method::PartitionPattern:
-      if (cross_join)
-        break;
-      return sim_search_part_patterns(
-        opt.file_name, opt.cutoff, opt.metric,
-        opt.include_duplicates);
-    default:
-      throw std::runtime_error(
-        "Invalid similarity join method use `pattern`, "
-        "`semi_pattern` or `partition_pattern`");
-  }
+      case Method::Pattern:
+      case Method::PartitionPattern:
+        throw std::runtime_error(
+          "Two-dataset joins are currently implemented "
+          "only for semi_pattern");
+      default:
+        throw std::runtime_error(
+          "Invalid similarity join method use `pattern`, "
+          "`semi_pattern` or `partition_pattern`");
+    }
+  } else {
+    if (opt.cutoff == 0) {
+      duplicates_search(opt.file_name);
+      return 0;
+    }
 
-  throw std::runtime_error(
-    "Two-dataset joins are currently implemented "
-    "only for semi_pattern");
+    switch (opt.method) {
+      case Method::Pattern:
+        return sim_search_patterns(
+          opt.file_name, opt.cutoff, opt.metric,
+          opt.include_duplicates);
+      case Method::SemiPattern:
+        return sim_search_semi_patterns(
+          opt.file_name, opt.cutoff, opt.metric,
+          opt.include_duplicates);
+      case Method::PartitionPattern:
+        return sim_search_part_patterns(
+          opt.file_name, opt.cutoff, opt.metric,
+          opt.include_duplicates);
+      default:
+        throw std::runtime_error(
+          "Invalid similarity join method use `pattern`, "
+          "`semi_pattern` or `partition_pattern`");
+    }
+  }
 }
