@@ -10,7 +10,7 @@
 
 struct Options {
   std::string file_name;
-  std::string file_b;
+  std::vector<std::string> file_names;
   int cutoff;
   char metric;
   std::string method;
@@ -23,7 +23,7 @@ Options parse_arguments(int argc, char* argv[]) {
   int option_index = 0;
 
   struct option long_options[] = {
-    {"file_b", 1, 0, 'b'},
+    {"file_names", 1, 0, 'F'},
     {"file_name", 1, 0, 'f'},
     {"cutoff", 1, 0, 'c'},
     {"metric_type", 1, 0, 't'},
@@ -32,12 +32,21 @@ Options parse_arguments(int argc, char* argv[]) {
     {0, 0, 0, 0}
   };
 
-  while ((opt = getopt_long(argc, argv, "f:b:c:t:m:d:", long_options, &option_index)) != -1) {
+  while ((opt = getopt_long(argc, argv, "f:c:t:m:d:", long_options, &option_index)) != -1) {
     switch (opt) {
-      case 'b':
-        options.file_b = optarg;
+      case 'F':
+        if (!options.file_name.empty() || !options.file_names.empty())
+          throw std::runtime_error("Use either --file_name or --file_names, once");
+        if (std::string(optarg).empty() || optarg[0] == '-' || optind >= argc ||
+            std::string(argv[optind]).empty() || argv[optind][0] == '-')
+          throw std::runtime_error("--file_names requires exactly two paths");
+        options.file_names = {optarg, argv[optind++]};
         break;
       case 'f':
+        if (!options.file_name.empty() || !options.file_names.empty())
+          throw std::runtime_error("Use either --file_name or --file_names, once");
+        if (std::string(optarg).empty() || optarg[0] == '-')
+          throw std::runtime_error("--file_name requires exactly one path");
         options.file_name = optarg;
         break;
       case 'c':
@@ -67,19 +76,23 @@ Options parse_arguments(int argc, char* argv[]) {
     }
   }
 
+  if (options.file_name.empty() && options.file_names.empty())
+    throw std::runtime_error("Specify --file_name or --file_names");
+  if (optind != argc)
+    throw std::runtime_error("--file_name takes one path; --file_names takes two");
   return options;
 }
 
 int main(int argc, char* argv[]) {
   if (argc < 11)
     throw std::runtime_error(
-      "arguments: --file_name <file_name> [--file_b <file_name>] --cutoff <cutoff> --metric_type <metric> --method <method> --include_duplicates <true/false>");
+      "arguments: (--file_name <file> | --file_names <file_a> <file_b>) --cutoff <cutoff> --metric_type <metric> --method <method> --include_duplicates <true/false>");
 
   Options opt = parse_arguments(argc, argv);
-  if (!opt.file_b.empty()) {
+  if (!opt.file_names.empty()) {
     if (opt.method != "semi_pattern")
-      throw std::runtime_error("Two-file joins use method semi_pattern");
-    return sim_search_semi_patterns(opt.file_name, opt.file_b, opt.cutoff, opt.metric, opt.include_duplicates);
+      throw std::runtime_error("Two-dataset joins are currently implemented only for semi_pattern");
+    return sim_search_semi_patterns(opt.file_names[0], opt.file_names[1], opt.cutoff, opt.metric, opt.include_duplicates);
   }
   if (opt.cutoff == 0) {
     duplicates_search(opt.file_name);

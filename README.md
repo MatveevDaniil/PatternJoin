@@ -43,7 +43,7 @@ Assuming you are in the build directory
 
 ### Arguments
 - `<file_name>`: The path to the input file.
-- `--file_b` (`-b`): Optional second input file; joins the first file against this one using `semi_pattern`. Output: `<file_name>_cross_sp_<cutoff>_<metric>`, with ordered first/second-file pairs (zero-based indices if `include_duplicates=true`, unique strings otherwise).
+- `--file_names <file_a> <file_b>`: Join two files using `semi_pattern`; use instead of `--file_name` and supply exactly two paths. Output: `<file_a>_cross_sp_<cutoff>_<metric>`, with ordered A/B pairs (zero-based indices if `include_duplicates=true`, unique strings otherwise).
 - `<cutoff>`: The edit distance cutoff (`0`, `1` or `2`). For single-file joins with `cutoff` = 0, the value of `metric_type`, `method` and `include_duplicates` does not matter.
 - `<metric_type>`: The edit distance metric (`L` for Levenshtein, `H` for Hamming).
 - `<method>`: The core method of edit similarity join (`pattern`, `semi_pattern`, or `partition_pattern`). As default, we recommend using `partition_pattern` as the most memory-efficient while still fast method. For more details take a look to [the paper](#paper).
