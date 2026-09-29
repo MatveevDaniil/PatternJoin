@@ -26,26 +26,20 @@ void sim_search_semi_patterns(
   int_pair_set& out
 ) {
   distance_k_ptr distance_k = get_distance_k(metric);
-  PatternFuncType PatternFunc = cutoff == 0 ? nullptr : getPatternFunc(cutoff, 'S');
+  PatternFuncType PatternFunc = getPatternFunc(cutoff, 'S');
   str2ints pat2str;
   std::vector<std::string> patterns;
 
   for (int i = 0; i < strings_a.size(); i++) {
     patterns.clear();
-    if (cutoff == 0)
-      patterns.push_back(strings_a[i]);
-    else
-      PatternFunc(strings_a[i], &patterns);
+    PatternFunc(strings_a[i], &patterns);
     for (const auto& pattern : patterns)
       pat2str[pattern].push_back(i);
   }
 
   for (int j = 0; j < strings_b.size(); j++) {
     patterns.clear();
-    if (cutoff == 0)
-      patterns.push_back(strings_b[j]);
-    else
-      PatternFunc(strings_b[j], &patterns);
+    PatternFunc(strings_b[j], &patterns);
     for (const auto& pattern : patterns) {
       auto entry = pat2str.find(pattern);
       if (entry == pat2str.end())

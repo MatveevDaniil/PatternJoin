@@ -127,6 +127,11 @@ int main(int argc, char* argv[]) {
   Options opt = parse_arguments(argc, argv);
   const bool cross_join = opt.file_names.size() == 2;
   if (cross_join) {
+    if (opt.cutoff == 0) {
+      duplicates_search(opt.file_names[0], opt.file_names[1]);
+      return 0;
+    }
+
     switch (opt.method) {
       case Method::SemiPattern:
         return sim_search_semi_patterns(

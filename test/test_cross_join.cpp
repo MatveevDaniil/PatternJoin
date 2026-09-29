@@ -1,4 +1,5 @@
 #include "sim_search_semi_patterns.hpp"
+#include "duplicates_search.hpp"
 #include <numeric>
 #include <iostream>
 #include <random>
@@ -29,7 +30,10 @@ void check(const std::vector<std::string>& a, const std::vector<std::string>& b)
             for (std::size_t j = 0; j < b.size(); ++j)
                 if (distance(a[i], b[j], metric) <= k) expected.insert({i, j});
         int_pair_set actual;
-        sim_search_semi_patterns(a, b, k, metric, actual);
+        if (k == 0)
+            duplicates_search(a, b, actual);
+        else
+            sim_search_semi_patterns(a, b, k, metric, actual);
         if (actual != expected)
             throw std::runtime_error("Cross join differs from exhaustive oracle");
     }
