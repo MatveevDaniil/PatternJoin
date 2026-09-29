@@ -1,7 +1,3 @@
-// From the repository root:
-// c++ -std=c++20 -O2 -Isrc test/test_cross_join.cpp src/sim_search_semi_patterns.cpp \
-//   src/patterns_generators.cpp src/bounded_edit_distance.cpp src/file_io.cpp -o /tmp/test_cross_join
-// /tmp/test_cross_join
 #include "sim_search_semi_patterns.hpp"
 #include <numeric>
 #include <iostream>
