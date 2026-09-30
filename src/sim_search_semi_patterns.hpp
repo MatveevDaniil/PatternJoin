@@ -60,6 +60,22 @@ void sim_search_semi_patterns_impl(
       out.insert({i, i});
 }
 
+void sim_search_semi_patterns(
+  const std::vector<std::string>& strings_a,
+  const std::vector<std::string>& strings_b,
+  int cutoff,
+  char metric,
+  int_pair_set& out
+);
+
+int sim_search_semi_patterns(
+  std::string file_name_a,
+  std::string file_name_b,
+  int cutoff,
+  char metric,
+  bool include_duplicates
+);
+
 int sim_search_semi_patterns(
   std::string file_name,
   int cutoff,
