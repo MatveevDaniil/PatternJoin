@@ -4,6 +4,9 @@ These implementations reuse the production semi-pattern generator,
 hash containers, and distance checker. They do not change dispatch
 or the production algorithm.
 
+See [results](results.md), [raw runs](runs.csv), and the
+[summary with ranges](summary.csv).
+
 | Variant | Stored clouds | Probing |
 | --- | --- | --- |
 | `dual_a` | A and B | A's pattern keys against B |

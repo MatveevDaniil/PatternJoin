@@ -111,7 +111,8 @@ def benchmark(args):
               n_a=len(a), n_b=len(b), cutoff=cutoff, metric='L',
               variant=variant, repeat=repeat, **result))
             with (ROOT/'results.csv').open('w') as file:
-              writer = csv.DictWriter(file, fieldnames=rows[0])
+              writer = csv.DictWriter(file, fieldnames=rows[0],
+                                      lineterminator='\n')
               writer.writeheader()
               writer.writerows(rows)
           print(source.name, case, cutoff, repeat,
