@@ -27,26 +27,34 @@ void sim_search_semi_patterns(
 ) {
   distance_k_ptr distance_k = get_distance_k(metric);
   PatternFuncType PatternFunc = getPatternFunc(cutoff, 'S');
+  const bool swap_inputs = strings_a.size() > strings_b.size();
+  const auto& indexed_strings = swap_inputs ? strings_b : strings_a;
+  const auto& query_strings = swap_inputs ? strings_a : strings_b;
   str2ints pat2str;
   std::vector<std::string> patterns;
 
-  for (int i = 0; i < strings_a.size(); i++) {
+  for (int i = 0; i < indexed_strings.size(); i++) {
     patterns.clear();
-    PatternFunc(strings_a[i], &patterns);
+    PatternFunc(indexed_strings[i], &patterns);
     for (const auto& pattern : patterns)
       pat2str[pattern].push_back(i);
   }
 
-  for (int j = 0; j < strings_b.size(); j++) {
+  for (int j = 0; j < query_strings.size(); j++) {
     patterns.clear();
-    PatternFunc(strings_b[j], &patterns);
+    PatternFunc(query_strings[j], &patterns);
     for (const auto& pattern : patterns) {
       auto entry = pat2str.find(pattern);
       if (entry == pat2str.end())
         continue;
-      for (int i : entry->second)
-        if (out.count({i, j}) == 0 && distance_k(strings_a[i], strings_b[j], cutoff))
-          out.insert({i, j});
+      for (int i : entry->second) {
+        const auto pair = swap_inputs ? std::make_pair(j, i)
+                                      : std::make_pair(i, j);
+        if (out.count(pair) == 0 &&
+            distance_k(strings_a[pair.first],
+              strings_b[pair.second], cutoff))
+          out.insert(pair);
+      }
     }
   }
 }
