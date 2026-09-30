@@ -69,6 +69,7 @@ int sim_search_semi_patterns(
   sim_search_semi_patterns(strings_a, strings_b, cutoff, metric, out);
   std::string out_file_name = file_name_a + "_cross_sp_" + std::to_string(cutoff) + "_" + metric;
   std::ofstream out_file(out_file_name);
+  out_file.exceptions(std::ios::failbit | std::ios::badbit);
   str_pair_set unique_out;
   for (const auto& pair : out) {
     if (include_duplicates)
@@ -76,5 +77,6 @@ int sim_search_semi_patterns(
     else if (unique_out.insert({strings_a[pair.first], strings_b[pair.second]}).second)
       out_file << strings_a[pair.first] << " " << strings_b[pair.second] << "\n";
   }
+  out_file.close();
   return 0;
 }

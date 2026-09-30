@@ -1,4 +1,5 @@
 #include "file_io.hpp"
+#include <filesystem>
 
 void readFile(
   const std::string& file_name,
@@ -7,6 +8,8 @@ void readFile(
   bool include_duplicates,
   str2ints& str2idxs
 ) {
+  if (std::filesystem::is_directory(file_name))
+    throw std::runtime_error("Input path is a directory");
   std::ifstream file(file_name);
   if (!file) {
     throw std::runtime_error("File does not exist");
@@ -19,6 +22,8 @@ void readFile(
       throw std::runtime_error("Empty line spotted in the input file\n");
     strings.push_back(line);
   }
+  if (file.bad())
+    throw std::runtime_error("Cannot read input file");
 
   str2idx.reserve(strings.size());
   for (int i = 0; i < strings.size(); i++)
@@ -40,6 +45,7 @@ void writeFile(
   bool include_duplicates
 ) {
   std::ofstream out_file;
+  out_file.exceptions(std::ios::failbit | std::ios::badbit);
   out_file.open(file_name);
   if (!include_duplicates)
     for (const auto& pair : out)

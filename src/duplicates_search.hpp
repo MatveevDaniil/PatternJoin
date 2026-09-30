@@ -13,6 +13,7 @@ void duplicates_search(
   readFile(file_name, strings, str2idx, true, str2idxs);
   std::string out_file_name = file_name + "_dupl";
   std::ofstream out_file;
+  out_file.exceptions(std::ios::failbit | std::ios::badbit);
   out_file.open(out_file_name);
   for (const auto& entry : str2idxs) {
     ints idxs = entry.second;
@@ -59,6 +60,7 @@ void duplicates_search(
   duplicates_search(strings_a, strings_b, out);
   std::string out_file_name = file_name_a + "_cross_dupl";
   std::ofstream out_file(out_file_name);
+  out_file.exceptions(std::ios::failbit | std::ios::badbit);
   for (const auto& pair : out)
     out_file << pair.first << " " << pair.second << "\n";
   out_file.close();

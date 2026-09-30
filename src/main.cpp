@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <set>
 #include "getopt.h"
 #include "duplicates_search.hpp"
 #include "sim_search_patterns.hpp"
@@ -20,10 +21,11 @@ struct Options {
 };
 
 Options parse_arguments(int argc, char* argv[]) {
-  Options options;
+  Options options{};
   int opt;
   int option_index = 0;
   bool input_selected = false;
+  std::set<int> provided_options;
 
   struct option long_options[] = {
     {"file_names", 1, 0, 'F'},
@@ -70,9 +72,13 @@ Options parse_arguments(int argc, char* argv[]) {
         input_selected = true;
         break;
       }
-      case 'c':
-        options.cutoff = std::stoi(optarg);
+      case 'c': {
+        std::size_t parsed;
+        options.cutoff = std::stoi(optarg, &parsed);
+        if (optarg[parsed] != '\0')
+          throw std::runtime_error("Cutoff must be an integer");
         break;
+      }
       case 't':
         if (std::string(optarg) == "H")
           options.metric = 'H';
@@ -106,24 +112,24 @@ Options parse_arguments(int argc, char* argv[]) {
       default:
         throw std::runtime_error("Unknown option");
     }
+    provided_options.insert(opt);
   }
 
   if (!input_selected)
     throw std::runtime_error("Specify --file_name or --file_names");
   if (optind != argc)
+    throw std::runtime_error("Unexpected positional argument");
+  const bool has_required_options =
+    provided_options.count('c') && provided_options.count('t') &&
+    provided_options.count('m') && provided_options.count('d');
+  if (!has_required_options)
     throw std::runtime_error(
-      "--file_name takes one path; --file_names takes two");
+      "Specify --cutoff, --metric_type, --method "
+      "and --include_duplicates");
   return options;
 }
 
 int main(int argc, char* argv[]) {
-  if (argc < 11)
-    throw std::runtime_error(
-      "arguments: (--file_name <file> | "
-      "--file_names <file_a> <file_b>) "
-      "--cutoff <cutoff> --metric_type <metric> "
-      "--method <method> --include_duplicates <true/false>");
-
   Options opt = parse_arguments(argc, argv);
   const bool cross_join = opt.file_names.size() == 2;
   if (cross_join) {
